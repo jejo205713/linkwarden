@@ -94,9 +94,6 @@ The phishing detection model analyzes multiple indicators:
 ---
 ## 📸 Project Screenshots
 
-### Message Scanner Interface
-![Message Scanner](https://raw.githubusercontent.com/jejo205713/linkwarden/main/working-images/message-legitimacy-scanner.png)
-
 ### Safe Message Prediction
 ![Safe Prediction](https://raw.githubusercontent.com/jejo205713/linkwarden/main/working-images/safe-prediction.png)
 
