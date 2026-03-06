@@ -3,6 +3,7 @@ from flask_cors import CORS
 from predictor import analyze_url
 from whois_lookup import get_whois_info
 from dns_lookup import get_dns_info
+from bert_engine import analyze_message
 import os
 
 app = Flask(
@@ -19,14 +20,22 @@ CORS(app)
 
 @app.route('/')
 def index():
-    """Serve main dashboard UI"""
     return render_template('index.html')
 
 
 @app.route('/report')
 def report_page():
-    """Serve cybercrime reporting page"""
     return render_template('report.html')
+
+
+@app.route('/bert')
+def bert_page():
+    return render_template('bert.html')
+
+
+@app.route('/favicon.ico')
+def favicon():
+    return app.send_static_file('favicon.ico')
 
 
 # ==========================================
@@ -35,30 +44,24 @@ def report_page():
 
 @app.route('/api/analyze', methods=['POST'])
 def analyze():
-    """Analyze URL using ML + WHOIS + DNS intelligence"""
 
-    data = request.get_json()
+    data = request.get_json(silent=True)
 
     if not data or 'url' not in data:
         return jsonify({"error": "No URL provided"}), 400
 
     url = data['url'].strip()
 
-    # Normalize URL
     if not url.startswith('http'):
         url = 'http://' + url
 
     try:
-        # 1️⃣ Run ML model
         analysis = analyze_url(url)
 
-        # 2️⃣ Fetch WHOIS info
         whois_info = get_whois_info(url)
 
-        # 3️⃣ Fetch DNS info (optional but useful)
         dns_info = get_dns_info(url)
 
-        # 4️⃣ Build response for frontend
         response = {
             "status": analysis.get("status", "SAFE"),
             "confidence_score": analysis.get("confidence_score", 0),
@@ -84,14 +87,35 @@ def analyze():
 
 
 # ==========================================
+# API: Message Scam Detection
+# ==========================================
+
+@app.route('/api/analyze-message', methods=['POST'])
+def analyze_msg():
+
+    data = request.get_json(silent=True)
+    msg = data.get('message', '')
+
+    if not msg:
+        return jsonify({"error": "No message"}), 400
+
+    try:
+        result = analyze_message(msg)
+        return jsonify(result), 200
+
+    except Exception as e:
+        print(f"BERT ERROR: {str(e)}")
+        return jsonify({"error": "Message analysis failed"}), 500
+
+
+# ==========================================
 # API: Cybercrime Report
 # ==========================================
 
 @app.route('/api/report', methods=['POST'])
 def submit_report():
-    """Handle cybercrime incident reports"""
 
-    data = request.get_json()
+    data = request.get_json(silent=True)
 
     print("\n" + "="*50)
     print("🚨 NEW CYBERCRIME INCIDENT REPORTED 🚨")
