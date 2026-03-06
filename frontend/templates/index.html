@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkWarden | Enterprise Threat Dashboard</title>
+    
+    <!-- Professional Cyber Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Link to your existing style.css -->
+    <link rel="stylesheet" href="/static/style.css">
+    
+    <!-- Chart.js for Threat Vector Analysis -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-body">
+
+    <div class="dashboard-container">
+
+        <!-- Sidebar: Static Accuracy & Navigation -->
+        <aside class="stats-sidebar">
+            <div class="logo-area">
+                <span class="logo-icon">🛡️</span>
+                <span class="logo-text">LINKWARDEN</span>
+                <span class="version">v2.1-PRO</span>
+            </div>
+
+            <div class="stat-card mt-2">
+                <label>ISOLATION FOREST ACCURACY</label>
+                <div class="value">98.7%</div>
+                <div class="mini-bar"><div style="width: 98.7%; background: var(--text-main); height: 100%;"></div></div>
+            </div>
+
+            <div class="stat-card">
+                <label>AVG. LATENCY</label>
+                <div class="value">240ms</div>
+                <div class="mini-bar"><div style="width: 30%; background: var(--border-color); height: 100%;"></div></div>
+            </div>
+
+            <div class="stat-card">
+                <label>ENGINE STATUS</label>
+                <div class="value status-safe blink">ACTIVE & ENFORCING</div>
+            </div>
+
+            <nav class="side-nav">
+                <a href="/" class="nav-link active">Threat Dashboard</a>
+                <a href="/report" class="nav-link">Incident Report</a>
+            </nav>
+        </aside>
+
+        <!-- MAIN VIEW -->
+        <main class="main-view">
+            
+            <header class="main-header">
+                <h2>DEEP LINK INSPECTION</h2>
+                <p class="mono text-muted">Awaiting target URL for heuristic and isolation analysis.</p>
+            </header>
+
+            <section class="search-area">
+                <input id="urlInput" type="text" placeholder="Enter suspicious URL (e.g., bit.ly/xyz)..." autocomplete="off" spellcheck="false"/>
+                <button id="analyzeBtn">INITIATE SCAN</button>
+            </section>
+
+            <!-- Loader State -->
+            <div id="loader" class="hidden">
+                <div class="spinner"></div>
+                <p class="mono blink" style="letter-spacing: 2px;">RUNNING ANOMALY DETECTION & OSINT...</p>
+            </div>
+
+            <!-- Dynamic Dashboard Results -->
+            <div id="dashboardGrid" class="dashboard-grid hidden">
+
+                <!-- Verdict Box (Full Width) -->
+                <div class="grid-item verdict-box" id="verdictWrapper">
+                    <label>FINAL ISOLATION VERDICT</label>
+                    <h1 id="verdictText">---</h1>
+                    <p id="riskScore" class="mono text-muted">Risk Score: 0%</p>
+                </div>
+
+                <!-- Threat Graph (Radar Chart) -->
+                <div class="grid-item">
+                    <label>THREAT VECTOR ANALYSIS</label>
+                    <div class="chart-container">
+                        <canvas id="threatChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Geo-Mapping Box (Dummy Server Location) -->
+                <div class="grid-item geo-box">
+                    <label>GEO-ROUTING TRACE</label>
+                    <div class="map-container">
+                        <!-- Stylized Minimal World Map SVG -->
+                        <svg viewBox="0 0 1000 500" class="world-map" preserveAspectRatio="xMidYMid meet">
+                            <path d="M150,150 Q200,100 250,150 T350,150 T450,100 T550,150 T650,200 T750,150 T850,250" fill="none" stroke="#333" stroke-width="2"/>
+                            <path d="M100,250 Q150,300 250,250 T400,200 T550,250 T700,300 T850,200" fill="none" stroke="#333" stroke-width="2"/>
+                            <!-- Map Grid Lines -->
+                            <line x1="0" y1="250" x2="1000" y2="250" stroke="#222" stroke-width="1" stroke-dasharray="5,5"/>
+                            <line x1="500" y1="0" x2="500" y2="500" stroke="#222" stroke-width="1" stroke-dasharray="5,5"/>
+                            
+                            <!-- Pulsing Target Node (Position updated by JS) -->
+                            <g id="geoTarget" transform="translate(500, 250)">
+                                <circle cx="0" cy="0" r="15" fill="none" stroke="var(--text-main)" class="pulse-ring"/>
+                                <circle cx="0" cy="0" r="4" fill="var(--text-main)"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="mono text-muted mt-2" style="font-size: 0.85rem;">
+                        <span>TARGET IP NODE: </span><span id="geoIp" class="text-main">...</span><br>
+                        <span>LOCATED IN: </span><span id="geoLoc" class="text-main">...</span>
+                    </div>
+                </div>
+
+                <!-- WHOIS / Domain Intel -->
+                <div class="grid-item">
+                    <label>OSINT DOMAIN INTELLIGENCE</label>
+                    <div class="mono-list">
+                        <p><span>Destination:</span> <span id="expandedUrl" class="text-main cut-text">-</span></p>
+                        <p><span>Domain Age:</span> <span id="domainAge" class="text-main">-</span></p>
+                        <p><span>Registrar:</span> <span id="registrar" class="text-main">-</span></p>
+                        <p><span>Redirects:</span> <span id="redirectCount" class="text-main">-</span></p>
+                    </div>
+                </div>
+
+                <!-- AI Explanation -->
+                <div class="grid-item explanation-box">
+                    <label>HEURISTIC ENGINE BREAKDOWN</label>
+                    <ul id="reasonsList" class="mono">
+                        <!-- Populated by JS -->
+                    </ul>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

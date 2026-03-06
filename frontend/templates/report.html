@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkWarden | Incident Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="dashboard-body">
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="stats-sidebar">
+            <div class="logo-area">
+                <span class="logo-icon">🛡️</span>
+                <span class="logo-text">LINKWARDEN</span>
+                <span class="version">v2.1-PRO</span>
+            </div>
+            <nav class="side-nav">
+                <a href="/" class="nav-link">Threat Dashboard</a>
+                <a href="/report" class="nav-link active">Incident Report</a>
+            </nav>
+        </aside>
+
+        <!-- Main View -->
+        <main class="main-view">
+            <header class="main-header">
+                <h2>CYBERCRIME REPORTING PORTAL</h2>
+                <p class="mono text-muted">SECURELY LOG INCIDENT DETAILS FOR AUTHORITIES.</p>
+            </header>
+
+            <div id="reportCard" class="form-card">
+                <form id="incidentForm" class="incident-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Full Name (Optional)</label>
+                            <input type="text" id="victimName" placeholder="John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label>Contact Email</label>
+                            <input type="email" id="victimEmail" placeholder="security@mail.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phishing URL</label>
+                        <input type="text" id="phishingUrl" placeholder="https://..." required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Date of Incident</label>
+                            <input type="date" id="incidentDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Impact Level</label>
+                            <select id="financialLoss">
+                                <option value="No">No financial loss</option>
+                                <option value="Credentials Stolen">Credentials Stolen</option>
+                                <option value="Money Lost">Money Lost</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Incident Details</label>
+                        <textarea id="incidentDetails" rows="4" placeholder="Describe the attack vector..."></textarea>
+                    </div>
+
+                    <button type="submit" id="submitReportBtn">SUBMIT ENCRYPTED REPORT</button>
+                </form>
+            </div>
+
+            <!-- Success Card -->
+            <div id="successCard" class="hidden form-card" style="text-align: center; padding: 4rem;">
+                <h2 class="status-safe" style="font-size: 2.5rem;">REPORT SECURED</h2>
+                <p class="mono text-muted" style="margin: 1rem 0;">Incident details logged for cyber authorities.</p>
+                <button onclick="window.location.reload()">NEW REPORT</button>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/report.js"></script>
+</body>
+</html>
