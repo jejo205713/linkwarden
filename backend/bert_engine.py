@@ -3,19 +3,15 @@ import torch
 import re
 import os
 
-# Get the directory where this file is located
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Path to your model folder (changed "models" -> "model")
 MODEL_PATH = os.path.abspath(
     os.path.join(BASE_DIR, "..", "model", "scam_distilbert_model")
 )
 
-# Check if model directory exists
 if not os.path.exists(MODEL_PATH):
     raise FileNotFoundError(f"Model directory not found: {MODEL_PATH}")
 
-# Load tokenizer and model from local files
 tokenizer = DistilBertTokenizerFast.from_pretrained(
     MODEL_PATH,
     local_files_only=True
@@ -26,27 +22,28 @@ model = DistilBertForSequenceClassification.from_pretrained(
     local_files_only=True
 )
 
-# Set model to evaluation mode
 model.eval()
+
 
 def analyze_message(message: str):
     """
     Analyze a message and determine if it is phishing, suspicious, or safe.
-    Uses BERT prediction + Heuristic keyword override for better sensitivity.
+    Uses BERT prediction + light heuristic keyword check.
     """
 
-    # 1. Preprocess
+    # Preprocess
     text = str(message).lower()
     text = re.sub(r"[ \t]+", " ", text)
 
-    # 2. Heuristic Keyword Check
+    # Heuristic keywords
     scam_keywords = [
-        'win', 'prize', 'lottery', 'verify', 'account', 'bank',
-        'urgent', 'click here', 'suspended', 'password', 'login'
+        "win", "prize", "lottery", "verify", "account", "bank",
+        "urgent", "click", "suspended", "password", "login"
     ]
-    is_keyword_match = any(word in text for word in scam_keywords)
 
-    # 3. Model Inference
+    keyword_hits = sum(word in text for word in scam_keywords)
+
+    # Model inference
     inputs = tokenizer(
         text,
         return_tensors="pt",
@@ -59,15 +56,16 @@ def analyze_message(message: str):
         outputs = model(**inputs)
         logits = outputs.logits
 
-    # Get probability of being a scam (class 1)
     prob = torch.softmax(logits, dim=-1)[0][1].item()
     prob_percent = round(prob * 100, 2)
 
-    # 4. Dynamic Thresholding Logic
+    # Improved classification logic
     if prob >= 0.70:
         status = "PHISHING"
-    elif prob >= 0.25 or is_keyword_match:
+
+    elif prob >= 0.30 or (prob >= 0.20 and keyword_hits >= 2):
         status = "SUSPICIOUS"
+
     else:
         status = "SAFE"
 
