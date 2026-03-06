@@ -46,35 +46,33 @@ Uses **DistilBERT** to analyze messages containing links and detect scam intent.
 Example:
 "Your bank account has been suspended. Click here to verify."
 
-The NLP model detects scam language patterns.
-
 ---
-
 # 🧠 Detection Pipeline
+
 User Input
-│
-▼
+   │
+   ▼
 URL Extraction
-│
-▼
+   │
+   ▼
 Shortened URL Expansion
-│
-▼
+   │
+   ▼
 Feature Extraction
-│
-├─ URL Structure Features
-├─ DNS Lookup
-├─ WHOIS Analysis
-├─ Suspicious TLD Detection
-└─ NLP Scam Text Analysis
-│
-▼
-Machine Learning Model
-│
-▼
-Risk Score Calculation
-│
-▼
+   │
+   ├─ URL Structure Features
+   ├─ DNS Lookup
+   ├─ WHOIS Analysis
+   ├─ Suspicious TLD Detection
+   └─ NLP Scam Text Analysis (DistilBERT)
+   │
+   ▼
+Machine Learning Model (Isolation Forest)
+   │
+   ▼
+Risk Score Calculation (with Domain Age Override)
+   │
+   ▼
 Final Classification
 (Safe / Suspicious / Phishing)
 
