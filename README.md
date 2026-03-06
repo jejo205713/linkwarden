@@ -92,6 +92,27 @@ The phishing detection model analyzes multiple indicators:
 | Query Parameters | Excessive parameters indicate obfuscation |
 
 ---
+## 📸 Project Screenshots
+
+### Message Scanner Interface
+![Message Scanner](https://raw.githubusercontent.com/jejo205713/linkwarden/main/working-images/message-legitimacy-scanner.png)
+
+### Safe Message Prediction
+![Safe Prediction](https://raw.githubusercontent.com/jejo205713/linkwarden/main/working-images/safe-prediction.png)
+
+### Suspicious Message Detection
+![Suspicious Prediction](https://raw.githubusercontent.com/jejo205713/linkwarden/main/working-images/suspicious-prediction.png)
+
+### Suspicious Message Example 2
+![Suspicious Prediction 2](https://raw.githubusercontent.com/jejo205713/linkwarden/main/working-images/suspicious-prediction2.png)
+
+### Malicious Message Detection
+![Malicious Message](https://raw.githubusercontent.com/jejo205713/linkwarden/main/working-images/Message-legitimacy-malicious.png)
+
+### Phishing Link Creation (Zphisher Example)
+![Zphisher Attack Example](https://raw.githubusercontent.com/jejo205713/linkwarden/main/working-images/zphisher-phishing-link-creation.png)
+
+---
 
 # 🚀 Installation
 
