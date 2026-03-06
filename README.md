@@ -47,75 +47,6 @@ Example:
 "Your bank account has been suspended. Click here to verify."
 
 ---
-# 🧠 Detection Pipeline
-
-User Input
-   │
-   ▼
-URL Extraction
-   │
-   ▼
-Shortened URL Expansion
-   │
-   ▼
-Feature Extraction
-   │
-   ├─ URL Structure Features
-   ├─ DNS Lookup
-   ├─ WHOIS Analysis
-   ├─ Suspicious TLD Detection
-   └─ NLP Scam Text Analysis (DistilBERT)
-   │
-   ▼
-Machine Learning Model (Isolation Forest)
-   │
-   ▼
-Risk Score Calculation (with Domain Age Override)
-   │
-   ▼
-Final Classification
-(Safe / Suspicious / Phishing)
-
-
----
-
-# 🏗️ Project Architecture
-
-
-LinkWarden/
-│
-├── backend/
-│ ├── app.py
-│ ├── predictor.py
-│ ├── feature_extract.py
-│ ├── dns_lookup.py
-│ ├── whois_lookup.py
-│ └── model/
-│ └── phishing_model.pkl
-│
-├── frontend/
-│ ├── templates/
-│ │ ├── index.html
-│ │ └── dashboard.html
-│ │
-│ └── static/
-│ ├── css/
-│ │ └── style.css
-│ ├── js/
-│ │ └── script.js
-│ └── assets/
-│
-├── dataset/
-│ └── phishing_dataset.csv
-│
-├── model/
-│ └── train_model.py
-│
-├── requirements.txt
-└── README.md
-
-
----
 
 # 🧰 Tech Stack
 
@@ -169,40 +100,44 @@ The phishing detection model analyzes multiple indicators:
 ```bash
 git clone https://github.com/yourusername/linkwarden-ai.git
 cd linkwarden-ai
+```
 2️⃣ Create Virtual Environment
+```
 python3 -m venv venv
 source venv/bin/activate
-
+```
 Linux / Mac
-
+```
 venv\Scripts\activate
-
+```
 Windows
 
 3️⃣ Install Dependencies
+```
 pip install -r requirements.txt
+```
 ▶️ Running the Application
 
 Start the backend server:
-
+```
 python backend/app.py
-
+```
 Then open:
-
+```
 http://127.0.0.1:5000
+```
+---
 🧪 Example Usage
 
 Input URL:
-
+```
 http://paypal-security-update.xyz/login
-
+```
 Output:
-
+```
 Risk Score: 0.91
 Classification: PHISHING
-📈 Future Improvements
-
-Browser extension for real-time phishing detection
+```
 
 Telegram / WhatsApp bot for link scanning
 
@@ -218,7 +153,7 @@ Team Dedcell
 
 JEJO J
 
-Cybersecurity Hackathon Project
+Cybersecurity Hackathon Project -Kreative Genesis (KGISL)
 
 ⚠️ Disclaimer
 
