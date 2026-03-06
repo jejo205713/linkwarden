@@ -107,7 +107,7 @@ The phishing detection model analyzes multiple indicators:
 ![Malicious Message](https://raw.githubusercontent.com/jejo205713/linkwarden/main/working-images/Message-legitimacy-malicious.png)
 
 ### Phishing Link Creation (Zphisher Example)
-![Zphisher Attack Example](https://raw.githubusercontent.com/jejo205713/linkwarden/main/working-images/zphisher-phishing-link-creation.png)
+![Zphisher Attack Example](https://github.com/jejo205713/linkwarden/blob/main/working-images/zphisher-phishing%20-link-creation.png)
 
 ---
 
