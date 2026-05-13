@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkWarden | Message Scam Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-body">
+
+    <div class="dashboard-container">
+        <aside class="stats-sidebar">
+            <div class="logo-area">
+                <span class="logo-text">LINKWARDEN</span>
+                <span class="version">v2.1-PRO</span>
+            </div>
+
+            <div class="stat-card mt-2">
+                <label>NLP ENGINE</label>
+                <div class="value" id="engineStatus">DISTILBERT</div>
+                <div class="mini-bar"><div id="engineBar" style="width: 50%; background: var(--text-muted); height: 100%;"></div></div>
+            </div>
+
+            <div class="stat-card">
+                <label>HEURISTIC KEYWORDS</label>
+                <div class="value">80+</div>
+            </div>
+
+            <div class="stat-card">
+                <label>LANGUAGES</label>
+                <div class="value">EN / HI / TA</div>
+            </div>
+
+            <nav class="side-nav">
+                <a href="/" class="nav-link">Threat Dashboard</a>
+                <a href="/bert" class="nav-link active">Message Analysis</a>
+                <a href="/report" class="nav-link">Incident Report</a>
+            </nav>
+        </aside>
+
+        <main class="main-view">
+            <header class="main-header">
+                <h2>NLP MESSAGE SCAM ANALYSIS</h2>
+                <p class="mono text-muted">DistilBERT classification with multilingual heuristics for SMS / WhatsApp content.</p>
+            </header>
+
+            <section class="search-area" style="flex-direction: column; align-items: stretch;">
+                <textarea id="messageInput" rows="6"
+                    placeholder="Paste a suspicious SMS or WhatsApp message..."></textarea>
+                <button id="analyzeMsgBtn" style="margin-top: 1rem;">ANALYZE MESSAGE</button>
+            </section>
+
+            <div id="msgLoader" class="hidden" style="margin-top: 2rem;">
+                <div class="spinner"></div>
+                <p class="mono blink" style="letter-spacing: 2px;">RUNNING DISTILBERT INFERENCE...</p>
+            </div>
+
+            <div id="msgGrid" class="dashboard-grid hidden">
+
+                <div class="grid-item verdict-box" id="msgVerdictWrapper">
+                    <label>NLP VERDICT</label>
+                    <h1 id="msgVerdict">---</h1>
+                    <p id="msgProbability" class="mono text-muted">Scam probability: 0%</p>
+                    <p id="msgConfidence" class="mono text-muted" style="margin-top: 4px;">Confidence: 0%</p>
+                </div>
+
+                <div class="grid-item">
+                    <label>RISK VECTOR ANALYSIS</label>
+                    <div class="chart-container">
+                        <canvas id="msgThreatChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="grid-item">
+                    <label>DETECTION SUMMARY</label>
+                    <div class="mono-list">
+                        <p><span>Model Status:</span> <span id="modelStatus" class="text-main">-</span></p>
+                        <p><span>Categories Hit:</span> <span id="categoriesHit" class="text-main">-</span></p>
+                        <p><span>Keyword Hits:</span> <span id="keywordCount" class="text-main">-</span></p>
+                        <p><span>Embedded URLs:</span> <span id="embeddedUrls" class="text-main">-</span></p>
+                    </div>
+                </div>
+
+                <div class="grid-item explanation-box">
+                    <label>MATCHED KEYWORDS</label>
+                    <div id="keywordChips" class="chip-row">
+                        <span class="text-muted mono" style="font-size: 0.85rem;">No keyword hits.</span>
+                    </div>
+                </div>
+
+                <div class="grid-item explanation-box">
+                    <label>ENGINE BREAKDOWN</label>
+                    <ul id="msgReasonsList" class="mono">
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const btn = document.getElementById("analyzeMsgBtn");
+            const input = document.getElementById("messageInput");
+            const loader = document.getElementById("msgLoader");
+            const grid = document.getElementById("msgGrid");
+            const verdictWrap = document.getElementById("msgVerdictWrapper");
+            const verdict = document.getElementById("msgVerdict");
+            const prob = document.getElementById("msgProbability");
+            const confEl = document.getElementById("msgConfidence");
+            const modelStatusEl = document.getElementById("modelStatus");
+            const categoriesEl = document.getElementById("categoriesHit");
+            const keywordCountEl = document.getElementById("keywordCount");
+            const embeddedUrlsEl = document.getElementById("embeddedUrls");
+            const chips = document.getElementById("keywordChips");
+            const reasonsList = document.getElementById("msgReasonsList");
+            const engineStatus = document.getElementById("engineStatus");
+            const engineBar = document.getElementById("engineBar");
+
+            let chartInstance = null;
+
+            input.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) btn.click();
+            });
+
+            btn.addEventListener("click", async () => {
+                const message = input.value.trim();
+                if (!message) {
+                    alert("Paste a message to analyze.");
+                    return;
+                }
+
+                grid.classList.add("hidden");
+                loader.classList.remove("hidden");
+
+                try {
+                    const response = await fetch("/api/analyze-message", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ message }),
+                    });
+                    const data = await response.json();
+                    loader.classList.add("hidden");
+
+                    if (!response.ok) {
+                        grid.classList.remove("hidden");
+                        verdict.innerText = "ERROR";
+                        verdict.className = "status-suspicious";
+                        prob.innerText = data.error || "Analysis failed.";
+                        return;
+                    }
+
+                    renderResult(data);
+                } catch (err) {
+                    console.error(err);
+                    loader.classList.add("hidden");
+                    alert("Network error — could not reach analysis engine.");
+                }
+            });
+
+            function renderResult(data) {
+                grid.classList.remove("hidden");
+
+                verdict.innerText = data.status;
+                verdict.className = "";
+                if (data.status === "SAFE") {
+                    verdict.classList.add("status-safe");
+                    verdictWrap.style.borderTopColor = "var(--safe)";
+                } else if (data.status === "PHISHING") {
+                    verdict.classList.add("status-phishing");
+                    verdictWrap.style.borderTopColor = "var(--phishing)";
+                } else {
+                    verdict.classList.add("status-suspicious");
+                    verdictWrap.style.borderTopColor = "var(--suspicious)";
+                }
+
+                prob.innerText = `Scam probability: ${data.scam_probability}%`;
+                confEl.innerText = `Confidence: ${data.confidence_score}%`;
+
+                const modelOn = !!data.model_available;
+                modelStatusEl.innerText = modelOn ? "DistilBERT loaded" : "Heuristic-only mode";
+                engineStatus.innerText = modelOn ? "DISTILBERT" : "HEURISTIC";
+                engineBar.style.width = modelOn ? "100%" : "40%";
+                engineBar.style.background = modelOn ? "var(--text-main)" : "var(--suspicious)";
+
+                const categories = data.detected_categories || [];
+                categoriesEl.innerText = categories.length
+                    ? categories.map(c => c.replace(/_/g, " ")).join(", ")
+                    : "None";
+
+                const keywords = data.matched_keywords || [];
+                keywordCountEl.innerText = keywords.length;
+
+                const embeddedFromRules = (data.triggered_rules || []).includes("EMBEDDED_URL");
+                embeddedUrlsEl.innerText = embeddedFromRules ? "Yes" : "No";
+
+                chips.innerHTML = "";
+                if (keywords.length === 0) {
+                    const span = document.createElement("span");
+                    span.className = "text-muted mono";
+                    span.style.fontSize = "0.85rem";
+                    span.innerText = "No keyword hits.";
+                    chips.appendChild(span);
+                } else {
+                    keywords.forEach(kw => {
+                        const chip = document.createElement("span");
+                        chip.className = "kw-chip";
+                        chip.innerText = kw;
+                        chips.appendChild(chip);
+                    });
+                }
+
+                reasonsList.innerHTML = "";
+                (data.explanations || []).forEach(reason => {
+                    const li = document.createElement("li");
+                    li.innerText = reason;
+                    reasonsList.appendChild(li);
+                });
+                (data.triggered_rules || []).forEach(rule => {
+                    const li = document.createElement("li");
+                    li.innerText = "[rule] " + rule;
+                    li.style.opacity = "0.75";
+                    reasonsList.appendChild(li);
+                });
+
+                renderChart(data.status, data.risk_factors || {});
+            }
+
+            function renderChart(status, rf) {
+                const ctx = document.getElementById("msgThreatChart").getContext("2d");
+                if (chartInstance) chartInstance.destroy();
+
+                const labels = ["Credential Phishing", "Money Lure", "Urgency Pressure", "Official Impersonation"];
+                const dataScores = [
+                    rf.credential_phishing || 0,
+                    rf.money_lure || 0,
+                    rf.urgency_pressure || 0,
+                    rf.official_impersonation || 0,
+                ];
+
+                const color = status === "SAFE" ? "#00ff66"
+                            : status === "PHISHING" ? "#ff3333"
+                            : "#ffaa00";
+
+                chartInstance = new Chart(ctx, {
+                    type: "radar",
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: "Risk vector (0-100)",
+                            data: dataScores,
+                            backgroundColor: color + "33",
+                            borderColor: color,
+                            borderWidth: 2,
+                            pointBackgroundColor: color,
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { r: { suggestedMin: 0, suggestedMax: 100, ticks: { display: false } } },
+                        plugins: { legend: { labels: { color: "#888", font: { size: 11 } } } },
+                    },
+                });
+            }
+        });
+    </script>
+</body>
+</html>

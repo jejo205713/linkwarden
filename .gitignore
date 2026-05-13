@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.cache/
+
+# Runtime-persisted incident reports — never commit real data
+data/reports.jsonl
+data/reports.sqlite
+data/reports.sqlite-journal
+
+# Local docs/plans (kept out of repo to avoid clutter; regenerate on demand)
+docs/superpowers/
+venv/ 
